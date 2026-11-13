@@ -1,1 +1,71 @@
 
+/* The Grind Admin Panel */
+
+.admin-layout {
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.sidebar a {
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.admin-main {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.admin-top h1 {
+  font-size: clamp(27px, 4vw, 36px);
+  margin: 8px 0;
+}
+
+.admin-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.stat-card {
+  box-shadow: 0 5px 20px rgba(217, 75, 138, 0.04);
+}
+
+.admin-section {
+  scroll-margin-top: 25px;
+}
+
+.admin-section .card {
+  box-shadow: 0 4px 16px rgba(217, 75, 138, 0.04);
+}
+
+.notice {
+  color: #8c3560;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .sidebar nav {
+    align-items: center;
+  }
+
+  .admin-main {
+    padding-bottom: 45px;
+  }
+}
+
