@@ -415,7 +415,7 @@ function setupUGCSubmission() {
     message.textContent = "";
 
     try {
-      const { error } = await client
+      const { error } = await window.supabasePublicClient
         .from("submissions")
         .insert({
           submission_type: "ugc",
