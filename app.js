@@ -1,4 +1,5 @@
 
+
 document.addEventListener("DOMContentLoaded", () => {
   // Automatically update the copyright year
   const yearElement = document.getElementById("current-year");
@@ -27,12 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Load published campaigns from Supabase
+  // Load data from Supabase
   loadCampaigns();
+  loadGiveaways();
 
   console.log("The Grind app.js loaded successfully.");
 });
 
+// Escape HTML
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => {
     const entities = {
@@ -47,6 +50,7 @@ function escapeHTML(value) {
   });
 }
 
+// Allow only HTTP and HTTPS links
 function safeExternalURL(value) {
   if (!value) return null;
 
@@ -63,6 +67,7 @@ function safeExternalURL(value) {
   return null;
 }
 
+// Load published campaigns from Supabase
 async function loadCampaigns() {
   const campaignList = document.getElementById("campaign-list");
 
@@ -102,9 +107,7 @@ async function loadCampaigns() {
       return `
         <article class="card">
           <span class="badge">Published</span>
-
           <h3>${title}</h3>
-
           <p>${description}</p>
 
           ${
@@ -136,3 +139,83 @@ async function loadCampaigns() {
       "<p>Unable to load campaigns right now. Please refresh the page.</p>";
   }
 }
+
+// Load active and closed giveaways from Supabase
+async function loadGiveaways() {
+  const activeList = document.getElementById("active-giveaway-list");
+  const closedList = document.getElementById("closed-giveaway-list");
+
+  if (!activeList || !closedList) return;
+
+  const client = window.supabaseClient;
+
+  if (!client) {
+    activeList.innerHTML = "<p>Unable to connect to the database.</p>";
+    closedList.innerHTML = "<p>Unable to connect to the database.</p>";
+    return;
+  }
+
+  activeList.innerHTML = "<p>Loading active giveaways...</p>";
+  closedList.innerHTML = "<p>Loading closed giveaways...</p>";
+
+  try {
+    const { data, error } = await client
+      .from("giveaways")
+      .select("id, title, description, reward, status, created_at")
+      .in("status", ["active", "closed"])
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    const activeGiveaways = (data || []).filter(
+      (giveaway) => giveaway.status === "active"
+    );
+
+    const closedGiveaways = (data || []).filter(
+      (giveaway) => giveaway.status === "closed"
+    );
+
+    function renderGiveaways(giveaways, status) {
+      if (giveaways.length === 0) {
+        return `<p>No ${status} giveaways available right now.</p>`;
+      }
+
+      return giveaways.map((giveaway) => {
+        const title = escapeHTML(giveaway.title);
+        const description = escapeHTML(giveaway.description);
+        const reward = escapeHTML(giveaway.reward);
+
+        return `
+          <article class="card">
+            <span class="badge">${status === "active" ? "Active" : "Closed"}</span>
+            <h3>${title}</h3>
+            <p>${description}</p>
+            <p><strong>Reward:</strong> ${reward}</p>
+          </article>
+        `;
+      }).join("");
+    }
+
+    activeList.innerHTML = renderGiveaways(
+      activeGiveaways,
+      "active"
+    );
+
+    closedList.innerHTML = renderGiveaways(
+      closedGiveaways,
+      "closed"
+    );
+
+    console.log("Giveaways loaded:", data?.length || 0);
+
+  } catch (error) {
+    console.error("Giveaway loading error:", error);
+
+    activeList.innerHTML =
+      "<p>Unable to load active giveaways. Please refresh the page.</p>";
+
+    closedList.innerHTML =
+      "<p>Unable to load closed giveaways. Please refresh the page.</p>";
+  }
+}
+
