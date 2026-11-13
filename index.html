@@ -1,1 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Grind | Web3 Community</title>
+  <meta name="description" content="Discover Web3 campaigns, giveaways and community opportunities with The Grind.">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8fb;
+      color: #29232a;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid #f2dce7;
+      padding: 18px 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo { font-size: 25px; font-weight: 800; color: #d94b8a; }
+    nav { display: flex; gap: 20px; flex-wrap: wrap; }
+    nav a { color: #514650; text-decoration: none; font-size: 14px; }
+    nav a:hover { color: #d94b8a; }
+    .hero {
+      padding: 85px 7%;
+      text-align: center;
+      background: linear-gradient(135deg, #ffe5f0, #fff5e9);
+    }
+    .hero small { color: #d94b8a; font-weight: bold; }
+    .hero h1 { font-size: clamp(38px, 6vw, 62px); margin: 18px 0; }
+    .hero p { color: #716671; line-height: 1.7; max-width: 570px; margin: auto; }
+    .hero a {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 14px 25px;
+      background: #d94b8a;
+      color: white;
+      text-decoration: none;
+      border-radius: 9px;
+      font-weight: bold;
+    }
+    main { padding: 55px 7%; }
+    .section-heading { margin-bottom: 25px; }
+    .section-heading h2 { font-size: 28px; margin-bottom: 8px; }
+    .section-heading p { color: #817580; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: white;
+      padding: 25px;
+      border: 1px solid #f1dce6;
+      border-radius: 14px;
+    }
+    .card .emoji { font-size: 28px; }
+    .card h3 { margin: 15px 0 8px; }
+    .card p { color: #817580; font-size: 14px; line-height: 1.6; }
+    .status {
+      display: inline-block;
+      margin-top: 17px;
+      color: #d94b8a;
+      background: #fff0f6;
+      padding: 7px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    footer {
+      background: white;
+      border-top: 1px solid #f2dce7;
+      padding: 25px 7%;
+      text-align: center;
+      color: #817580;
+      font-size: 13px;
+    }
+    @media (max-width: 600px) {
+      header { justify-content: center; }
+      nav { justify-content: center; gap: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">The Grind.</div>
+    <nav>
+      <a href="#discover">Discover</a>
+      <a href="#giveaways">Giveaways</a>
+      <a href="#join">Join Campaign</a>
+      <a href="#ugc">UGC</a>
+      <a href="#raid">Raid Channel</a>
+    </nav>
+  </header>
 
+  <section class="hero">
+    <small>WELCOME TO THE GRIND COMMUNITY</small>
+    <h1>Find Opportunities.<br>Make Your Move.</h1>
+    <p>Discover Web3 campaigns, join giveaways, share your content and grow with a community that keeps grinding.</p>
+    <a href="#discover">Explore Opportunities</a>
+  </section>
+
+  <main>
+    <section id="discover">
+      <div class="section-heading">
+        <h2>Discover</h2>
+        <p>Explore opportunities from the community.</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="emoji">🚀</div>
+          <h3>Active Campaigns</h3>
+          <p>Find ongoing Web3 campaigns and discover new opportunities.</p>
+          <span class="status">Explore campaigns</span>
+        </article>
+        <article class="card">
+          <div class="emoji">🎁</div>
+          <h3>Giveaways</h3>
+          <p>Explore active and closed community giveaways.</p>
+          <span class="status">View giveaways</span>
+        </article>
+        <article class="card">
+          <div class="emoji">✍️</div>
+          <h3>UGC Opportunities</h3>
+          <p>Share your original content and submit your X post links.</p>
+          <span class="status">Create content</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="giveaways" style="margin-top:60px">
+      <div class="section-heading">
+        <h2>Giveaways</h2>
+        <p>Community giveaways will appear here.</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <h3>Active Giveaways</h3>
+          <p>Check out currently running giveaways.</p>
+        </article>
+        <article class="card">
+          <h3>Closed Giveaways</h3>
+          <p>See previously completed giveaways.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="join" style="margin-top:60px">
+      <div class="section-heading">
+        <h2>Join Campaign</h2>
+        <p>Campaign tasks and submission forms will be available here.</p>
+      </div>
+    </section>
+
+    <section id="ugc" style="margin-top:60px">
+      <div class="section-heading">
+        <h2>UGC</h2>
+        <p>Submit your X post link and share your creative work.</p>
+      </div>
+    </section>
+
+    <section id="raid" style="margin-top:60px">
+      <div class="section-heading">
+        <h2>Raid Channel</h2>
+        <p>Find community raid posts and participate together.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 The Grind Community. Built for the community.
+  </footer>
+</body>
+</html>
