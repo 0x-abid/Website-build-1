@@ -37,8 +37,41 @@
   </style>
 </head>
 <body>
+  
+  <!-- Admin Login -->
+  <section id="admin-login" class="admin-login" hidden>
+    <h1>Admin Login</h1>
+    <p>Sign in to manage The Grind.</p>
 
-  <div class="admin-layout">
+    <form id="admin-login-form">
+      <label for="admin-email">Email Address</label>
+      <input
+        type="email"
+        id="admin-email"
+        placeholder="Enter your email"
+        autocomplete="username"
+        required
+      >
+
+      <label for="admin-password">Password</label>
+      <input
+        type="password"
+        id="admin-password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button type="submit" class="btn" id="admin-login-button">
+        Sign In
+      </button>
+
+      <p id="admin-login-message" role="alert" aria-live="polite"></p>
+    </form>
+  </section>
+
+
+  <div class="admin-layout" id="admin-dashboard" hidden>
 
     <aside class="sidebar">
       <h2>The Grind.</h2>
