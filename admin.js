@@ -25,6 +25,19 @@ const campaignFormTitle = document.getElementById("campaign-form-title");
 const campaignSaveButton = document.getElementById("campaign-save-button");
 const campaignCancelButton = document.getElementById("campaign-cancel-button");
 
+// Giveaway elements
+const giveawayForm = document.getElementById("giveaway-form");
+const giveawayList = document.getElementById("giveaway-list");
+const giveawayMessage = document.getElementById("giveaway-message");
+const giveawayId = document.getElementById("giveaway-id");
+const giveawayTitle = document.getElementById("giveaway-title");
+const giveawayDescription = document.getElementById("giveaway-description");
+const giveawayReward = document.getElementById("giveaway-reward");
+const giveawayStatus = document.getElementById("giveaway-status");
+const giveawayFormTitle = document.getElementById("giveaway-form-title");
+const giveawaySaveButton = document.getElementById("giveaway-save-button");
+const giveawayCancelButton = document.getElementById("giveaway-cancel-button");
+
 // Show login screen
 function showLogin(message = "") {
   loginSection.hidden = false;
@@ -64,9 +77,10 @@ async function verifyAdmin(user) {
   }
 
   showDashboard();
-  await loadCampaigns();
+await loadCampaigns();
+await loadGiveaways();
 
-  return true;
+return true;
 }
 
 // Check existing login session
@@ -411,4 +425,206 @@ if (client) {
 
 // Start admin panel
 initializeAdmin();
+
+/* GIVEAWAY MANAGEMENT */
+
+// Load giveaways
+async function loadGiveaways() {
+  if (!client || !giveawayList) return;
+
+  giveawayList.textContent = "Loading giveaways...";
+
+  const { data, error } = await client
+    .from("giveaways")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Giveaway loading error:", error);
+    giveawayList.textContent = "Unable to load giveaways.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    giveawayList.textContent = "No giveaways created yet.";
+    return;
+  }
+
+  giveawayList.innerHTML = data.map((giveaway) => {
+    const id = escapeHTML(giveaway.id);
+    const title = escapeHTML(giveaway.title);
+    const description = escapeHTML(giveaway.description);
+    const reward = escapeHTML(giveaway.reward);
+    const status = escapeHTML(giveaway.status);
+
+    const nextStatus =
+      giveaway.status === "active" ? "closed" : "active";
+
+    const statusButton =
+      giveaway.status === "active"
+        ? "Close Giveaway"
+        : "Activate Giveaway";
+
+    return `
+      <div class="card" style="margin-top:15px; padding:18px;">
+        <h3>${title}</h3>
+        <p style="white-space:pre-wrap;">${description}</p>
+        <p><strong>Reward:</strong> ${reward}</p>
+        <p><strong>Status:</strong> ${status.toUpperCase()}</p>
+
+        <button type="button" class="btn"
+          data-giveaway-action="edit" data-id="${id}">
+          Edit
+        </button>
+
+        <button type="button" class="btn"
+          data-giveaway-action="status" data-id="${id}"
+          data-status="${nextStatus}">
+          ${statusButton}
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+// Reset giveaway form
+function resetGiveawayForm() {
+  giveawayForm.reset();
+  giveawayId.value = "";
+  giveawayFormTitle.textContent = "Create New Giveaway";
+  giveawaySaveButton.textContent = "Save Giveaway";
+  giveawayCancelButton.hidden = true;
+  giveawayMessage.textContent = "";
+}
+
+// Create or update giveaway
+giveawayForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!client) {
+    giveawayMessage.textContent = "Supabase connection failed.";
+    return;
+  }
+
+  const giveawayData = {
+    title: giveawayTitle.value.trim(),
+    description: giveawayDescription.value.trim(),
+    reward: giveawayReward.value.trim(),
+    status: giveawayStatus.value
+  };
+
+  if (
+    !giveawayData.title ||
+    !giveawayData.description ||
+    !giveawayData.reward
+  ) {
+    giveawayMessage.textContent = "Please fill in all fields.";
+    return;
+  }
+
+  giveawaySaveButton.disabled = true;
+  giveawayMessage.textContent = "Saving giveaway...";
+
+  let result;
+
+  if (giveawayId.value) {
+    result = await client
+      .from("giveaways")
+      .update(giveawayData)
+      .eq("id", giveawayId.value);
+  } else {
+    result = await client
+      .from("giveaways")
+      .insert(giveawayData);
+  }
+
+  giveawaySaveButton.disabled = false;
+
+  if (result.error) {
+    console.error("Giveaway save error:", result.error);
+    giveawayMessage.textContent =
+      "Could not save giveaway. Check database permissions.";
+    return;
+  }
+
+  resetGiveawayForm();
+  giveawayMessage.textContent = "Giveaway saved successfully.";
+
+  await loadGiveaways();
+});
+
+// Giveaway edit and status actions
+giveawayList.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-giveaway-action]");
+
+  if (!button || !client) return;
+
+  const id = button.dataset.id;
+  const action = button.dataset.giveawayAction;
+
+  button.disabled = true;
+
+  if (action === "edit") {
+    const { data, error } = await client
+      .from("giveaways")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    button.disabled = false;
+
+    if (error || !data) {
+      alert("Unable to load this giveaway.");
+      return;
+    }
+
+    giveawayId.value = data.id;
+    giveawayTitle.value = data.title || "";
+    giveawayDescription.value = data.description || "";
+    giveawayReward.value = data.reward || "";
+    giveawayStatus.value = data.status || "active";
+
+    giveawayFormTitle.textContent = "Edit Giveaway";
+    giveawaySaveButton.textContent = "Update Giveaway";
+    giveawayCancelButton.hidden = false;
+
+    giveawayForm.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return;
+  }
+
+  if (action === "status") {
+    const newStatus = button.dataset.status;
+
+    if (!["active", "closed"].includes(newStatus)) {
+      button.disabled = false;
+      return;
+    }
+
+    const { error } = await client
+      .from("giveaways")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    button.disabled = false;
+
+    if (error) {
+      console.error("Giveaway status error:", error);
+      alert("Could not update giveaway status.");
+      return;
+    }
+
+    await loadGiveaways();
+  }
+});
+
+// Cancel giveaway editing
+giveawayCancelButton.addEventListener(
+  "click",
+  resetGiveawayForm
+);
+
 
