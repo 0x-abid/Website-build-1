@@ -1,6 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Automatically update the copyright year
+  // Automatically update copyright year
   const yearElement = document.getElementById("current-year");
 
   if (yearElement) {
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (target) {
         event.preventDefault();
+
         target.scrollIntoView({
           behavior: "smooth",
           block: "start"
@@ -30,11 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load data from Supabase
   loadCampaigns();
   loadGiveaways();
-  loadUGC();
   setupUGCSubmission();
+  loadUGC();
 
   console.log("The Grind app.js loaded successfully.");
 });
+
 
 // Escape HTML
 function escapeHTML(value) {
@@ -50,6 +52,7 @@ function escapeHTML(value) {
     return entities[char];
   });
 }
+
 
 // Allow only HTTP and HTTPS links
 function safeExternalURL(value) {
@@ -67,6 +70,35 @@ function safeExternalURL(value) {
 
   return null;
 }
+
+
+// Validate X post URL
+function isValidXPostURL(value) {
+  try {
+    const url = new URL(value);
+
+    const validHost = [
+      "x.com",
+      "www.x.com",
+      "twitter.com",
+      "www.twitter.com"
+    ].includes(url.hostname.toLowerCase());
+
+    const validPath = /^\/[^/]+\/status\/[0-9]+\/?$/.test(
+      url.pathname
+    );
+
+    return (
+      ["https:", "http:"].includes(url.protocol) &&
+      validHost &&
+      validPath
+    );
+
+  } catch (error) {
+    return false;
+  }
+}
+
 
 // Load published campaigns from Supabase
 async function loadCampaigns() {
@@ -141,6 +173,7 @@ async function loadCampaigns() {
   }
 }
 
+
 // Load active and closed giveaways from Supabase
 async function loadGiveaways() {
   const activeList = document.getElementById("active-giveaway-list");
@@ -151,8 +184,12 @@ async function loadGiveaways() {
   const client = window.supabaseClient;
 
   if (!client) {
-    activeList.innerHTML = "<p>Unable to connect to the database.</p>";
-    closedList.innerHTML = "<p>Unable to connect to the database.</p>";
+    activeList.innerHTML =
+      "<p>Unable to connect to the database.</p>";
+
+    closedList.innerHTML =
+      "<p>Unable to connect to the database.</p>";
+
     return;
   }
 
@@ -188,7 +225,10 @@ async function loadGiveaways() {
 
         return `
           <article class="card">
-            <span class="badge">${status === "active" ? "Active" : "Closed"}</span>
+            <span class="badge">
+              ${status === "active" ? "Active" : "Closed"}
+            </span>
+
             <h3>${title}</h3>
             <p>${description}</p>
             <p><strong>Reward:</strong> ${reward}</p>
@@ -219,6 +259,7 @@ async function loadGiveaways() {
       "<p>Unable to load closed giveaways. Please refresh the page.</p>";
   }
 }
+
 
 // Load published UGC projects from Supabase
 async function loadUGC() {
@@ -252,14 +293,18 @@ async function loadUGC() {
     }
 
     ugcList.innerHTML = data.map((project) => {
+      const id = escapeHTML(project.id);
       const title = escapeHTML(project.title);
       const description = escapeHTML(project.description);
       const projectURL = safeExternalURL(project.project_url);
 
       return `
         <article class="card">
+
           <span class="badge">UGC Opportunity</span>
+
           <h3>${title}</h3>
+
           <p>${description}</p>
 
           ${
@@ -272,6 +317,36 @@ async function loadUGC() {
                 >View Project</a>`
               : ""
           }
+
+          <form
+            class="ugc-submission-form"
+            data-project-id="${id}"
+          >
+
+            <label for="ugc-link-${id}">
+              Submit Your X Post
+            </label>
+
+            <input
+              type="url"
+              id="ugc-link-${id}"
+              name="proof_url"
+              placeholder="https://x.com/username/status/123456789"
+              required
+            >
+
+            <button type="submit" class="btn">
+              Submit Your Post
+            </button>
+
+            <p
+              class="ugc-submission-message"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+          </form>
+
         </article>
       `;
     }).join("");
@@ -284,4 +359,87 @@ async function loadUGC() {
     ugcList.innerHTML =
       "<p>Unable to load UGC projects right now. Please refresh the page.</p>";
   }
+}
+
+
+// Set up UGC submission handler
+function setupUGCSubmission() {
+  const ugcList = document.getElementById("ugc-project-list");
+
+  if (!ugcList) return;
+
+  if (ugcList.dataset.submissionHandlerReady === "true") {
+    return;
+  }
+
+  ugcList.dataset.submissionHandlerReady = "true";
+
+  ugcList.addEventListener("submit", async (event) => {
+    const form = event.target.closest(".ugc-submission-form");
+
+    if (!form) return;
+
+    event.preventDefault();
+
+    const client = window.supabaseClient;
+
+    const message = form.querySelector(
+      ".ugc-submission-message"
+    );
+
+    const button = form.querySelector(
+      'button[type="submit"]'
+    );
+
+    const input = form.querySelector(
+      'input[name="proof_url"]'
+    );
+
+    if (!client) {
+      message.textContent =
+        "Database connection unavailable.";
+      return;
+    }
+
+    const projectId = form.dataset.projectId;
+    const postURL = input.value.trim();
+
+    if (!isValidXPostURL(postURL)) {
+      message.textContent =
+        "Please enter a valid X post URL.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Submitting...";
+    message.textContent = "";
+
+    try {
+      const { error } = await client
+        .from("submissions")
+        .insert({
+          submission_type: "ugc",
+          ugc_post_id: projectId,
+          proof_url: new URL(postURL).href,
+          status: "pending"
+        });
+
+      if (error) throw error;
+
+      message.textContent =
+        "Your X post was submitted successfully! Status: Pending.";
+
+      form.reset();
+
+    } catch (error) {
+      console.error("UGC submission error:", error);
+
+      message.textContent =
+        "Submission failed. Please try again later.";
+
+    } finally {
+      button.disabled = false;
+      button.textContent = "Submit Your Post";
+    }
+  });
 }
