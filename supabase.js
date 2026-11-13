@@ -6,19 +6,19 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_utJ2qHk0rBfksn3X_Ls6kQ_bmJjKSpz
 
 const { createClient } = supabase;
 
-// Main client: Admin login and normal website operations
+// Main client: Admin and website operations
 window.supabaseClient = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
 
-// Separate client: Public submissions only
-// It does not restore or persist the Admin login session.
+// Public client: Separate storage key
 window.supabaseAnonClient = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY,
   {
     auth: {
+      storageKey: "the-grind-public-auth",
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false
@@ -26,5 +26,4 @@ window.supabaseAnonClient = createClient(
   }
 );
 
-console.log("The Grind Supabase clients connected");
-
+console.log("The Grind Supabase clients initialized.");
