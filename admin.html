@@ -1,1 +1,150 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | The Grind</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { min-height: 100vh; }
+    .admin-layout { display: grid; grid-template-columns: 230px 1fr; min-height: 100vh; }
+    .sidebar { background: #fff; border-right: 1px solid var(--border); padding: 28px 20px; }
+    .sidebar h2 { color: var(--pink); margin-bottom: 30px; }
+    .sidebar a { display: block; padding: 12px; margin-bottom: 7px; border-radius: 8px; color: var(--text); font-weight: 600; }
+    .sidebar a:hover, .sidebar a.active { background: var(--pink-light); color: var(--pink); }
+    .admin-main { padding: 35px; min-width: 0; }
+    .admin-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 18px; margin: 25px 0; }
+    .stat-card { background: white; border: 1px solid var(--border); padding: 22px; border-radius: var(--radius); }
+    .stat-card p { color: var(--muted); font-size: 14px; }
+    .stat-card h2 { color: var(--pink); font-size: 30px; margin-top: 8px; }
+    .admin-section { margin-top: 35px; }
+    .admin-section h2 { margin-bottom: 15px; }
+    .notice { padding: 16px; background: var(--pink-light); border: 1px solid var(--border); border-radius: 10px; margin-top: 15px; }
+    .admin-login { max-width: 420px; margin: 80px auto; padding: 28px; background: white; border: 1px solid var(--border); border-radius: var(--radius); }
+    .admin-login h1 { margin-bottom: 10px; }
+    .admin-login p { color: var(--muted); margin-bottom: 20px; }
+    @media(max-width:700px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .sidebar { border-right: 0; border-bottom: 1px solid var(--border); }
+      .sidebar nav { display: flex; flex-wrap: wrap; gap: 5px; }
+      .sidebar a { margin: 0; }
+      .admin-main { padding: 22px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <aside class="sidebar">
+      <h2>The Grind.</h2>
+      <nav>
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#campaigns">Campaigns</a>
+        <a href="#giveaways">Giveaways</a>
+        <a href="#submissions">Submissions</a>
+        <a href="#ugc">UGC Management</a>
+        <a href="#raids">Raid Management</a>
+        <a href="#settings">Feature Settings</a>
+        <a href="index.html">← View Website</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+
+      <div class="admin-top">
+        <div>
+          <span class="eyebrow">Administration</span>
+          <h1>Admin Dashboard</h1>
+          <p>Manage The Grind community platform.</p>
+        </div>
+        <span class="badge">Admin Area</span>
+      </div>
+
+      <section id="dashboard">
+        <h2>Overview</h2>
+        <div class="admin-grid">
+          <div class="stat-card">
+            <p>Active Campaigns</p>
+            <h2>0</h2>
+          </div>
+          <div class="stat-card">
+            <p>Giveaways</p>
+            <h2>0</h2>
+          </div>
+          <div class="stat-card">
+            <p>Pending Submissions</p>
+            <h2>0</h2>
+          </div>
+          <div class="stat-card">
+            <p>UGC Posts</p>
+            <h2>0</h2>
+          </div>
+        </div>
+      </section>
+
+      <section id="campaigns" class="admin-section">
+        <h2>Campaign Management</h2>
+        <div class="card">
+          <h3>Manage Campaigns</h3>
+          <p>Create, edit, publish or close community campaigns.</p>
+          <p class="notice">Campaign management will be connected to Supabase.</p>
+        </div>
+      </section>
+
+      <section id="giveaways" class="admin-section">
+        <h2>Giveaway Management</h2>
+        <div class="card">
+          <h3>Manage Giveaways</h3>
+          <p>Publish active giveaways and manage closed giveaways.</p>
+        </div>
+      </section>
+
+      <section id="submissions" class="admin-section">
+        <h2>Submission Management</h2>
+        <div class="card">
+          <h3>Review Submissions</h3>
+          <p>Review user submissions and approve or reject entries.</p>
+        </div>
+      </section>
+
+      <section id="ugc" class="admin-section">
+        <h2>UGC Management</h2>
+        <div class="card">
+          <h3>Creator Content</h3>
+          <p>Publish project notifications and review submitted X post links.</p>
+        </div>
+      </section>
+
+      <section id="raids" class="admin-section">
+        <h2>Raid Management</h2>
+        <div class="card">
+          <h3>Community Raids</h3>
+          <p>Create raid posts and configure proof submission requirements.</p>
+        </div>
+      </section>
+
+      <section id="settings" class="admin-section">
+        <h2>Feature Settings</h2>
+        <div class="card">
+          <h3>Platform Controls</h3>
+          <p>Configure which public website sections are visible.</p>
+          <p class="notice">Feature controls will be connected to the secure database.</p>
+        </div>
+      </section>
+
+      <p class="notice">
+        Important: This is currently a visual admin dashboard, not a secured login system.
+        Supabase authentication and database permissions must be configured before using it
+        for real administration.
+      </p>
+
+    </main>
+  </div>
+
+</body>
+</html>
+
