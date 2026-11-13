@@ -263,13 +263,68 @@
         </div>
       </section>
 
-      <section id="ugc" class="admin-section">
-        <h2>UGC Management</h2>
-        <div class="card">
-          <h3>Creator Content</h3>
-          <p>Publish project notifications and review submitted X post links.</p>
-        </div>
-      </section>
+      
+<section id="ugc" class="admin-section">
+  <h2>UGC Management</h2>
+
+  <div class="card">
+    <h3 id="ugc-form-title">Create UGC Project Notification</h3>
+
+    <form id="ugc-form">
+      <input type="hidden" id="ugc-id">
+
+      <label for="ugc-title">Project Title</label>
+      <input
+        type="text"
+        id="ugc-title"
+        placeholder="Enter project title"
+        required
+      >
+
+      <label for="ugc-description">Description</label>
+      <textarea
+        id="ugc-description"
+        placeholder="Describe the UGC task"
+        rows="4"
+        required
+      ></textarea>
+
+      <label for="ugc-project-url">Project Link</label>
+      <input
+        type="url"
+        id="ugc-project-url"
+        placeholder="https://example.com"
+      >
+
+      <label for="ugc-status">Status</label>
+      <select id="ugc-status" required>
+        <option value="published">Published</option>
+        <option value="closed">Closed</option>
+      </select>
+
+      <button type="submit" class="btn" id="ugc-save-button">
+        Publish Notification
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        id="ugc-cancel-button"
+        hidden
+      >
+        Cancel Edit
+      </button>
+
+      <p id="ugc-message" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>All UGC Projects</h3>
+    <div id="ugc-list">Loading UGC projects...</div>
+  </div>
+</section>
+
 
       <section id="raids" class="admin-section">
         <h2>Raid Management</h2>
