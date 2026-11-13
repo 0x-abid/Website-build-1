@@ -319,7 +319,7 @@ async function loadUGC() {
 }
 
 
-// Public UGC submission using direct REST API
+// Public UGC submission using anonymous REST API
 function setupUGCSubmission() {
   const ugcList = document.getElementById("ugc-project-list");
   if (!ugcList) return;
@@ -366,7 +366,6 @@ function setupUGCSubmission() {
           method: "POST",
           headers: {
             "apikey": publishableKey,
-            "Authorization": `Bearer ${publishableKey}`,
             "Content-Type": "application/json",
             "Content-Profile": "public",
             "Prefer": "return=minimal"
@@ -386,7 +385,7 @@ function setupUGCSubmission() {
         try {
           errorData = await response.json();
         } catch (parseError) {
-          // Keep the default error message
+          // Ignore response parsing errors
         }
 
         throw new Error(
