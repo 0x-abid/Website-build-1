@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     yearElement.textContent = new Date().getFullYear();
   }
 
-  // Smooth navigation for section links
+  // Smooth navigation
   const navigationLinks = document.querySelectorAll(
     '.nav-links a[href^="#"]'
   );
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Load data from Supabase
+  // Load website data
   loadCampaigns();
   loadGiveaways();
   setupUGCSubmission();
@@ -100,7 +100,7 @@ function isValidXPostURL(value) {
 }
 
 
-// Load published campaigns from Supabase
+// Load published campaigns
 async function loadCampaigns() {
   const campaignList = document.getElementById("campaign-list");
 
@@ -174,7 +174,7 @@ async function loadCampaigns() {
 }
 
 
-// Load active and closed giveaways from Supabase
+// Load active and closed giveaways
 async function loadGiveaways() {
   const activeList = document.getElementById("active-giveaway-list");
   const closedList = document.getElementById("closed-giveaway-list");
@@ -184,12 +184,8 @@ async function loadGiveaways() {
   const client = window.supabaseClient;
 
   if (!client) {
-    activeList.innerHTML =
-      "<p>Unable to connect to the database.</p>";
-
-    closedList.innerHTML =
-      "<p>Unable to connect to the database.</p>";
-
+    activeList.innerHTML = "<p>Unable to connect to the database.</p>";
+    closedList.innerHTML = "<p>Unable to connect to the database.</p>";
     return;
   }
 
@@ -261,7 +257,7 @@ async function loadGiveaways() {
 }
 
 
-// Load published UGC projects from Supabase
+// Load published UGC projects
 async function loadUGC() {
   const ugcList = document.getElementById("ugc-project-list");
 
@@ -381,7 +377,8 @@ function setupUGCSubmission() {
 
     event.preventDefault();
 
-    const client = window.supabaseClient;
+    // Use the separate public/anonymous Supabase client
+    const client = window.supabaseAnonClient;
 
     const message = form.querySelector(
       ".ugc-submission-message"
@@ -397,7 +394,8 @@ function setupUGCSubmission() {
 
     if (!client) {
       message.textContent =
-        "Database connection unavailable.";
+        "Public database connection unavailable. Please refresh the page.";
+      console.error("supabaseAnonClient is missing.");
       return;
     }
 
@@ -415,7 +413,7 @@ function setupUGCSubmission() {
     message.textContent = "";
 
     try {
-      const { error } = await window.supabasePublicClient
+      const { error } = await client
         .from("submissions")
         .insert({
           submission_type: "ugc",
@@ -431,11 +429,13 @@ function setupUGCSubmission() {
 
       form.reset();
 
-    } catch (error) {
-  console.error("UGC submission error:", error);
+      console.log("UGC submission successful.");
 
-  message.textContent =
-    "Error: " + (error.message || "Unknown database error");
+    } catch (error) {
+      console.error("UGC submission error:", error);
+
+      message.textContent =
+        "Error: " + (error.message || "Unknown database error");
 
     } finally {
       button.disabled = false;
