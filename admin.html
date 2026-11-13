@@ -191,13 +191,69 @@
 </section>
 
 
-      <section id="giveaways" class="admin-section">
-        <h2>Giveaway Management</h2>
-        <div class="card">
-          <h3>Manage Giveaways</h3>
-          <p>Publish active giveaways and manage closed giveaways.</p>
-        </div>
-      </section>
+      
+<section id="giveaways" class="admin-section">
+  <h2>Giveaway Management</h2>
+
+  <div class="card">
+    <h3 id="giveaway-form-title">Create New Giveaway</h3>
+
+    <form id="giveaway-form">
+      <input type="hidden" id="giveaway-id">
+
+      <label for="giveaway-title">Giveaway Title</label>
+      <input
+        type="text"
+        id="giveaway-title"
+        placeholder="Enter giveaway title"
+        required
+      >
+
+      <label for="giveaway-description">Description</label>
+      <textarea
+        id="giveaway-description"
+        placeholder="Describe the giveaway"
+        rows="4"
+        required
+      ></textarea>
+
+      <label for="giveaway-reward">Reward</label>
+      <input
+        type="text"
+        id="giveaway-reward"
+        placeholder="Example: $100 USDT"
+        required
+      >
+
+      <label for="giveaway-status">Giveaway Status</label>
+      <select id="giveaway-status" required>
+        <option value="active">Active</option>
+        <option value="closed">Closed</option>
+      </select>
+
+      <button type="submit" class="btn" id="giveaway-save-button">
+        Save Giveaway
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        id="giveaway-cancel-button"
+        hidden
+      >
+        Cancel Edit
+      </button>
+
+      <p id="giveaway-message" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>All Giveaways</h3>
+    <div id="giveaway-list">Loading giveaways...</div>
+  </div>
+</section>
+
 
       <section id="submissions" class="admin-section">
         <h2>Submission Management</h2>
