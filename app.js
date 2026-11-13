@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadCampaigns();
   loadGiveaways();
   loadUGC();
+  setupUGCSubmission();
 
   console.log("The Grind app.js loaded successfully.");
 });
