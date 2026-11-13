@@ -123,14 +123,73 @@
         </div>
       </section>
 
-      <section id="campaigns" class="admin-section">
-        <h2>Campaign Management</h2>
-        <div class="card">
-          <h3>Manage Campaigns</h3>
-          <p>Create, edit, publish or close community campaigns.</p>
-          <p class="notice">Campaign management will be connected to Supabase.</p>
-        </div>
-      </section>
+      
+<section id="campaigns" class="admin-section">
+  <h2>Campaign Management</h2>
+
+  <div class="card">
+    <h3 id="campaign-form-title">Create New Campaign</h3>
+
+    <form id="campaign-form">
+      <input type="hidden" id="campaign-id">
+
+      <label for="campaign-title">Campaign Title</label>
+      <input
+        type="text"
+        id="campaign-title"
+        placeholder="Enter campaign title"
+        required
+      >
+
+      <label for="campaign-description">Description</label>
+      <textarea
+        id="campaign-description"
+        placeholder="Describe the campaign"
+        rows="4"
+        required
+      ></textarea>
+
+      <label for="campaign-requirements">Requirements</label>
+      <textarea
+        id="campaign-requirements"
+        placeholder="Enter campaign requirements"
+        rows="3"
+      ></textarea>
+
+      <label for="campaign-url">External Link</label>
+      <input
+        type="url"
+        id="campaign-url"
+        placeholder="https://example.com"
+      >
+
+      <label for="campaign-status">Campaign Status</label>
+      <select id="campaign-status" required>
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+        <option value="closed">Closed</option>
+      </select>
+
+      <button type="submit" class="btn" id="campaign-save-button">
+        Save Campaign
+      </button>
+
+      <button type="button" class="btn" id="campaign-cancel-button" hidden>
+        Cancel Edit
+      </button>
+
+      <p id="campaign-message" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top: 20px;">
+    <h3>All Campaigns</h3>
+    <div id="campaign-list">
+      Loading campaigns...
+    </div>
+  </div>
+</section>
+
 
       <section id="giveaways" class="admin-section">
         <h2>Giveaway Management</h2>
