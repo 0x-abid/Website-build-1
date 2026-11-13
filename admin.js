@@ -38,6 +38,19 @@ const giveawayFormTitle = document.getElementById("giveaway-form-title");
 const giveawaySaveButton = document.getElementById("giveaway-save-button");
 const giveawayCancelButton = document.getElementById("giveaway-cancel-button");
 
+// UGC elements
+const ugcForm = document.getElementById("ugc-form");
+const ugcList = document.getElementById("ugc-list");
+const ugcMessage = document.getElementById("ugc-message");
+const ugcId = document.getElementById("ugc-id");
+const ugcTitle = document.getElementById("ugc-title");
+const ugcDescription = document.getElementById("ugc-description");
+const ugcProjectUrl = document.getElementById("ugc-project-url");
+const ugcStatus = document.getElementById("ugc-status");
+const ugcFormTitle = document.getElementById("ugc-form-title");
+const ugcSaveButton = document.getElementById("ugc-save-button");
+const ugcCancelButton = document.getElementById("ugc-cancel-button");
+
 // Show login screen
 function showLogin(message = "") {
   loginSection.hidden = false;
@@ -79,6 +92,7 @@ async function verifyAdmin(user) {
   showDashboard();
 await loadCampaigns();
 await loadGiveaways();
+await loadUGC();
 
 return true;
 }
@@ -625,6 +639,238 @@ giveawayList.addEventListener("click", async (event) => {
 giveawayCancelButton.addEventListener(
   "click",
   resetGiveawayForm
+);
+/* UGC MANAGEMENT */
+
+// Load UGC projects
+async function loadUGC() {
+  if (!client || !ugcList) return;
+
+  ugcList.textContent = "Loading UGC projects...";
+
+  const { data, error } = await client
+    .from("ugc_posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("UGC loading error:", error);
+    ugcList.textContent = "Unable to load UGC projects.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    ugcList.textContent = "No UGC projects created yet.";
+    return;
+  }
+
+  ugcList.innerHTML = data.map((post) => {
+    const id = escapeHTML(post.id);
+    const title = escapeHTML(post.title);
+    const description = escapeHTML(post.description);
+    const status = escapeHTML(post.status);
+
+    const projectURL = safeExternalURL(post.project_url);
+
+    const nextStatus =
+      post.status === "published" ? "closed" : "published";
+
+    const statusButton =
+      post.status === "published"
+        ? "Close UGC Project"
+        : "Publish UGC Project";
+
+    return `
+      <div class="card" style="margin-top:15px; padding:18px;">
+        <h3>${title}</h3>
+
+        <p style="white-space:pre-wrap;">${description}</p>
+
+        ${projectURL
+          ? `<p>
+              <a href="${escapeHTML(projectURL)}"
+                target="_blank"
+                rel="noopener noreferrer">
+                Open Project Link
+              </a>
+            </p>`
+          : ""}
+
+        <p><strong>Status:</strong> ${status.toUpperCase()}</p>
+
+        <button
+          type="button"
+          class="btn"
+          data-ugc-action="edit"
+          data-id="${id}">
+          Edit
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          data-ugc-action="status"
+          data-id="${id}"
+          data-status="${nextStatus}">
+          ${statusButton}
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+
+// Reset UGC form
+function resetUGCForm() {
+  ugcForm.reset();
+
+  ugcId.value = "";
+  ugcFormTitle.textContent = "Create UGC Project Notification";
+  ugcSaveButton.textContent = "Publish Notification";
+  ugcCancelButton.hidden = true;
+  ugcMessage.textContent = "";
+}
+
+
+// Create or update UGC project
+ugcForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!client) {
+    ugcMessage.textContent = "Supabase connection failed.";
+    return;
+  }
+
+  const projectURL = ugcProjectUrl.value.trim();
+
+  if (projectURL && !safeExternalURL(projectURL)) {
+    ugcMessage.textContent =
+      "Please enter a valid HTTP or HTTPS link.";
+    return;
+  }
+
+  const ugcData = {
+    title: ugcTitle.value.trim(),
+    description: ugcDescription.value.trim(),
+    project_url: projectURL || null,
+    status: ugcStatus.value
+  };
+
+  if (!ugcData.title || !ugcData.description) {
+    ugcMessage.textContent =
+      "Please enter a project title and description.";
+    return;
+  }
+
+  ugcSaveButton.disabled = true;
+  ugcMessage.textContent = "Saving UGC project...";
+
+  let result;
+
+  if (ugcId.value) {
+    result = await client
+      .from("ugc_posts")
+      .update(ugcData)
+      .eq("id", ugcId.value);
+  } else {
+    result = await client
+      .from("ugc_posts")
+      .insert(ugcData);
+  }
+
+  ugcSaveButton.disabled = false;
+
+  if (result.error) {
+    console.error("UGC save error:", result.error);
+
+    ugcMessage.textContent =
+      "Could not save UGC project. Check database permissions.";
+
+    return;
+  }
+
+  resetUGCForm();
+
+  ugcMessage.textContent =
+    "UGC project saved successfully.";
+
+  await loadUGC();
+});
+
+
+// UGC Edit and Publish/Close actions
+ugcList.addEventListener("click", async (event) => {
+  const button = event.target.closest("button[data-ugc-action]");
+
+  if (!button || !client) return;
+
+  const id = button.dataset.id;
+  const action = button.dataset.ugcAction;
+
+  button.disabled = true;
+
+  if (action === "edit") {
+    const { data, error } = await client
+      .from("ugc_posts")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    button.disabled = false;
+
+    if (error || !data) {
+      alert("Unable to load this UGC project.");
+      return;
+    }
+
+    ugcId.value = data.id;
+    ugcTitle.value = data.title || "";
+    ugcDescription.value = data.description || "";
+    ugcProjectUrl.value = data.project_url || "";
+    ugcStatus.value = data.status || "published";
+
+    ugcFormTitle.textContent = "Edit UGC Project";
+    ugcSaveButton.textContent = "Update UGC Project";
+    ugcCancelButton.hidden = false;
+
+    ugcForm.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    return;
+  }
+
+  if (action === "status") {
+    const newStatus = button.dataset.status;
+
+    if (!["published", "closed"].includes(newStatus)) {
+      button.disabled = false;
+      return;
+    }
+
+    const { error } = await client
+      .from("ugc_posts")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    button.disabled = false;
+
+    if (error) {
+      console.error("UGC status error:", error);
+      alert("Could not update UGC project status.");
+      return;
+    }
+
+    await loadUGC();
+  }
+});
+
+
+// Cancel UGC editing
+ugcCancelButton.addEventListener(
+  "click",
+  resetUGCForm
 );
 
 
