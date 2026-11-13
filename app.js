@@ -284,3 +284,69 @@ async function loadUGC() {
       "<p>Unable to load UGC projects right now. Please refresh the page.</p>";
   }
 }
+
+// Load published UGC projects from Supabase
+async function loadUGC() {
+  const ugcList = document.getElementById("ugc-project-list");
+
+  if (!ugcList) return;
+
+  const client = window.supabaseClient;
+
+  if (!client) {
+    ugcList.innerHTML =
+      "<p>Unable to connect to the database.</p>";
+    return;
+  }
+
+  ugcList.innerHTML = "<p>Loading UGC projects...</p>";
+
+  try {
+    const { data, error } = await client
+      .from("ugc_posts")
+      .select("id, title, description, project_url, status, created_at")
+      .eq("status", "published")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      ugcList.innerHTML =
+        "<p>No UGC projects available right now. Check back soon!</p>";
+      return;
+    }
+
+    ugcList.innerHTML = data.map((project) => {
+      const title = escapeHTML(project.title);
+      const description = escapeHTML(project.description);
+      const projectURL = safeExternalURL(project.project_url);
+
+      return `
+        <article class="card">
+          <span class="badge">UGC Opportunity</span>
+          <h3>${title}</h3>
+          <p>${description}</p>
+
+          ${
+            projectURL
+              ? `<a
+                  href="${escapeHTML(projectURL)}"
+                  class="btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >View Project</a>`
+              : ""
+          }
+        </article>
+      `;
+    }).join("");
+
+    console.log("Published UGC projects loaded:", data.length);
+
+  } catch (error) {
+    console.error("UGC loading error:", error);
+
+    ugcList.innerHTML =
+      "<p>Unable to load UGC projects. Please refresh the page.</p>";
+  }
+}
