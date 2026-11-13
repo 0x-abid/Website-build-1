@@ -432,10 +432,10 @@ function setupUGCSubmission() {
       form.reset();
 
     } catch (error) {
-      console.error("UGC submission error:", error);
+  console.error("UGC submission error:", error);
 
-      message.textContent =
-        "Submission failed. Please try again later.";
+  message.textContent =
+    "Error: " + (error.message || "Unknown database error");
 
     } finally {
       button.disabled = false;
