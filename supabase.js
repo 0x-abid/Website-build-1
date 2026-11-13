@@ -1,3 +1,4 @@
+
 /* The Grind - Supabase Connection */
 
 const SUPABASE_URL = "https://dyuveqiivnwnnmydhfft.supabase.co";
@@ -5,14 +6,15 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_utJ2qHk0rBfksn3X_Ls6kQ_bmJjKSpz
 
 const { createClient } = supabase;
 
-// Normal client: Admin login and dashboard
+// Main client: Admin login and normal website operations
 window.supabaseClient = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
 
-// Public client: Always uses the anonymous session
-window.supabasePublicClient = createClient(
+// Separate client: Public submissions only
+// It does not restore or persist the Admin login session.
+window.supabaseAnonClient = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY,
   {
@@ -24,4 +26,5 @@ window.supabasePublicClient = createClient(
   }
 );
 
-console.log("The Grind Supabase connected");
+console.log("The Grind Supabase clients connected");
+
